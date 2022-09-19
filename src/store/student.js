@@ -21,7 +21,6 @@ export const student = defineStore("student", {
         changeOpenDialog(method, student) {
             this.dialog.isOpen = !this.dialog.isOpen;
             this.dialog.method = method;
-
             if (student === undefined) {
                 this.dialog.student = {
                     student: {
@@ -34,7 +33,6 @@ export const student = defineStore("student", {
                             address: '',
                         }
                     }
-
                 }
             } else {
                 this.dialog.student = student;
@@ -50,8 +48,6 @@ export const student = defineStore("student", {
                 } catch (error) {
                     alert('Có lỗi xảy ra, vui lòng thử lại sau')
                 }
-
-
             } else {
                 try {
                     await axios.put("https://dummyjson.com/users/" + student.id, student)
@@ -74,15 +70,23 @@ export const student = defineStore("student", {
             }
         },
         deleteListStudent() {
-            console.log(this.listDeleteStudents)
-            for (let i = 0; i < this.listDeleteStudents.length; i++) {
-                try {
-                    this.deleteStudent(this.listDeleteStudents[i]);
-                } catch (error) {
-                    alert('Có lỗi xảy ra, vui lòng thử lại sau')
-                }
-            }
+            const promiseDeleteArr = this.listDeleteStudents.map((id) => {
+                return axios.delete("https://dummyjson.com/users/" + id)
+            })
+            Promise.all(promiseDeleteArr).then(() => alert('Xóa thành công'))
         },
+        checkAllStudent(){
+            if(this.listDeleteStudents.length >= this.listStudents.length) {
+                this.listDeleteStudents = []
+            }
+            else {
+                for (let i = 0; i < this.listStudents.length; i++) {
+                    this.listDeleteStudents.push(this.listStudents[i].id)
+                }
+                this.listDeleteStudents=[...new Set(this.listDeleteStudents)]
+            }
+            console.log(this.listDeleteStudents)
+        }
     }
 });
 

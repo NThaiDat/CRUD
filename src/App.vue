@@ -1,12 +1,9 @@
 <script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import HeaderTable from "./components/HeaderTable.vue";
 import DialogStudent from "./components/DialogStudent.vue";
-import {ref, reactive, onMounted, computed} from "vue";
+import {ref, reactive, onMounted, computed, watch} from "vue";
 import Student from "./components/Student.vue";
-import {student} from "./store/student.js";0
-import axios from "axios";
+import {student} from "./store/student.js";
 
 const totalPage = computed(() => {
   if (listStudent.listStudents.length % 5 == 0) {
@@ -14,21 +11,24 @@ const totalPage = computed(() => {
   } else {
     return parseInt(listStudent.listStudents.length / 5) + 1;
   }
-
 })
+
 const currentPage = ref(1)
 const listStudent = student();
-onMounted(async () => {
-  // const res = await axios.get('https://dummyjson.com/users')
-  // students.user = res.data.users
-  await listStudent.getListStudent()
-  // console.log(listStudent.listStudents)
+
+watch(totalPage, (newVal, oldVal) => {
+  if (newVal ===1) {
+    currentPage.value = 1;
+  }
 })
+
+onMounted(async () => {
+  await listStudent.getListStudent()
+})
+
 </script>
 
 <template>
-
-  <!--  <button @click="openDialog=!openDialog">Open</button>-->
   <HeaderTable/>
   <teleport to="body">
     <div class="w-96 p-3.5 dialog border border-2 border-b-gray-100 bg-white rounded" v-if="listStudent.dialog.isOpen">
@@ -38,7 +38,7 @@ onMounted(async () => {
   <table class="table table-auto w-full">
     <thead>
     <tr>
-      <th><input type="checkbox"></th>
+      <th><input type="checkbox" @change="listStudent.checkAllStudent"></th>
       <th>Name</th>
       <th>Email</th>
       <th>Phone</th>
@@ -47,17 +47,17 @@ onMounted(async () => {
     </tr>
     </thead>
     <tbody>
-    <tr v-for="student in listStudent.listStudents" :key="student.id">
-      <Student :student="student" v-if="5*(currentPage-1)<student.id&&student.id<=5*currentPage"></Student>
+    <tr v-for="(student,index) in listStudent.listStudents" :key="student.id">
+      <Student :student="student" v-if="5*(currentPage-1)<=index&&index<5*currentPage"></Student>
     </tr>
-
     </tbody>
   </table>
-  <div class="Pagination float-right">
-    <div v-for="i in totalPage" class="inline-block hover:bg-blue-400 hover:text-white m-1"
-    >
-      <button @click="currentPage=i;activePage=true" class="p-2">{{ i }}</button>
+  <div class="Pagination float-right inline mr-4" v-if="totalPage>1">
+    <button class="hover:bg-blue-400 hover:text-white m-1 mt-2 p-2" @click="currentPage--" :disabled="currentPage===1"><font-awesome-icon icon="fa-solid fa-angle-left" /></button>
+    <div v-for="i in totalPage" class="inline-block hover:bg-blue-400 hover:text-white m-1 mt-2">
+      <button @click="currentPage=i" class="p-2" :class="currentPage===i?'bg-blue-400 text-white' :'' ">{{ i }}</button>
     </div>
+    <button class="hover:bg-blue-400 hover:text-white m-1 mt-2 p-2" @click="currentPage++" :disabled="currentPage===totalPage"><font-awesome-icon icon="fa-solid fa-angle-right" /></button>
   </div>
 </template>
 

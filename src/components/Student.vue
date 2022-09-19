@@ -9,9 +9,8 @@
   <td>{{ students.student.address.address }}</td>
 
   <td>
-    <button @click="()=>{dialog.changeOpenDialog('Edit',students)}">
-      <font-awesome-icon icon="fa-solid fa-pen" style="color: yellow
-                         "/>
+    <button @click="()=>{dialog.changeOpenDialog('Edit',students)}" >
+      <font-awesome-icon icon="fa-solid fa-pen" class="text-yellow-400"/>
     </button>
     <button @click="()=>{dialog.deleteStudent(students.student.id)}">
       <font-awesome-icon icon="fa-solid fa-trash" style="color: red"/>
